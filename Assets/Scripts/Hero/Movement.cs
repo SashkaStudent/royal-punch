@@ -4,25 +4,49 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public BaseInput input; //Zenject
+    private BaseInput input; //Zenject
+    private Animator animator;
+    [SerializeField]
+    private float speed;
+    [SerializeField]
+    private float angleSpeed;
+
+    [SerializeField]
+    private GameObject mesh;
     // Start is called before the first frame update
     void Start()
     {
-        if (!TryGetComponent(out input)) return;
+        animator = GetComponentInChildren<Animator>();
+
+        if (!TryGetComponent(out input) || animator == null) return;
 
         input.OnMove += MoveHandler;
         input.OnEndMove += OnEndMove;
+        
     }
 
     private void OnEndMove()
     {
     }
 
-    private void MoveHandler(Vector2 direction)
+    private void MoveHandler(Vector3 localDirection)
     {
-        Vector3 localDirection = transform.InverseTransformDirection(direction);
-        transform.position += localDirection;
         transform.LookAt(Vector3.zero);
+
+        transform.RotateAround(Vector3.zero, Vector3.up, -localDirection.x * (angleSpeed / transform.position.magnitude) * Time.deltaTime);
+
+        transform.position += localDirection.z * speed * Time.deltaTime * transform.forward;
+
+        
+        Vector3 direction = transform.TransformDirection(localDirection);
+
+        Vector3 meshLook = direction.sqrMagnitude > 0 ? direction : transform.forward; 
+
+        mesh.transform.rotation = Quaternion.LookRotation(meshLook);
+        
+
+        animator.SetFloat("Horizontal", localDirection.x);
+        animator.SetFloat("Vertical", localDirection.z);
     }
 
     private void OnDestroy()
