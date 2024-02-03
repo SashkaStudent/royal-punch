@@ -8,16 +8,16 @@ public class Fight : MonoBehaviour
     float minDistance = 1f;
     private Animator animator;
 
+
     // Update is called once per frame
 
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
-        minDistance *= minDistance;
     }
     void Update()
     {
-        if(transform.position.sqrMagnitude <= minDistance)
+        if(transform.position.magnitude <= minDistance)
         {
             animator.SetLayerWeight(1, 1);
         } else

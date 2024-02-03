@@ -7,6 +7,8 @@ public class Movement : MonoBehaviour
     private BaseInput input; //Zenject
     private Animator animator;
     [SerializeField]
+    private float minDistance = 0.5f;
+    [SerializeField]
     private float speed;
     [SerializeField]
     private float angleSpeed;
@@ -35,9 +37,9 @@ public class Movement : MonoBehaviour
 
         transform.RotateAround(Vector3.zero, Vector3.up, -localDirection.x * (angleSpeed / transform.position.magnitude) * Time.deltaTime);
 
-        transform.position += localDirection.z * speed * Time.deltaTime * transform.forward;
+        if(transform.position.magnitude > minDistance || localDirection.z < 0)
+            transform.position += localDirection.z * speed * Time.deltaTime * transform.forward;
 
-        
         Vector3 direction = transform.TransformDirection(localDirection);
 
         Vector3 meshLook = direction.sqrMagnitude > 0 ? direction : transform.forward; 
