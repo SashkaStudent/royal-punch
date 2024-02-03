@@ -8,7 +8,7 @@ public class StateMachineAgent : MonoBehaviour
 {
     private Transform thisTransform;
     public Transform GetTransform => thisTransform;
-    [SerializeField] protected string entryState = "Approach";
+    [SerializeField] protected string entryState = "Fight";
     protected Dictionary<string, BaseState> States;
     protected BaseState currentState;
     public Action<StateMachineAgent> OnFinishWork;
@@ -31,7 +31,7 @@ public class StateMachineAgent : MonoBehaviour
         OnFinishWork?.Invoke(this);
     }
 
-    protected virtual void Awake()
+    protected virtual void Start()
     {
         thisTransform = transform;
         States = new Dictionary<string, BaseState>();

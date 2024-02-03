@@ -5,7 +5,9 @@ using UnityEngine;
 public class Fight : MonoBehaviour
 {
     [SerializeField]
-    float minDistance = 1f;
+    private float minDistance = 1f;
+    public float MinDistance => minDistance;
+
     private Animator animator;
 
 
