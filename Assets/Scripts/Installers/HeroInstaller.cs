@@ -7,8 +7,12 @@ public class HeroInstaller : MonoInstaller
 {
     [SerializeField]
     Fight fight;
+
+    [SerializeField]
+    EnemyHealth enemyHealth;
     public override void InstallBindings()
     {
         Container.BindInterfacesAndSelfTo<Fight>().FromInstance(fight).AsSingle();
+        Container.BindInterfacesAndSelfTo<EnemyHealth>().FromInstance(enemyHealth).AsSingle();
     }
 }

@@ -3,23 +3,41 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using Zenject;
 
 public class FightState : BaseState
 {
     EnemyFight fight;
+    EnemyHealth health;
+
+    StateMachineAgent agent;
     public override void DoWork(StateMachineAgent agent)
     {
     }
 
     public override void EnterState(StateMachineAgent agent)
     {
-        
+        this.agent = agent;
+
         fight = agent.GetComponent<EnemyFight>();
+        health = agent.GetComponent<EnemyHealth>();
+
         fight.enabled = true;
         fight.SetAnimRound();
         stateName = "Fight";
+
+        health.OnHealthChanged += HealthChangedHandler;
+
         Test(agent);
         
+    }
+
+    private void HealthChangedHandler(float newValue)
+    {
+        if (newValue <= 0)
+        {
+            agent.TransitionToState("Lie");
+        }
     }
 
     public override void ExitState(StateMachineAgent agent)
@@ -35,8 +53,8 @@ public class FightState : BaseState
           //  fight.SetAnimRound();
         await UniTask.Delay(5000);
         //  await UniTask.Create(fight.spells[0]).AttachExternalCancellation(tsc.Token);
-
-        agent.TransitionToState("Spell");
+        if(health.Current > 0)
+          agent.TransitionToState("Spell");
 
     }
 }

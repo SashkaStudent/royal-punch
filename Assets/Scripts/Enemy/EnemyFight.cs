@@ -37,7 +37,7 @@ public class EnemyFight : MonoBehaviour
 
         float dot = Vector3.Dot(playerFight.transform.forward, transform.forward);
 
-        if (playerFight.transform.position.magnitude < playerFight.MinDistance && dot < dotThreashold)
+        if (playerFight.isActiveAndEnabled && playerFight.transform.position.magnitude < playerFight.MinDistance && dot < dotThreashold)
         {
             Sequence sb = DOTween.Sequence();
             sb.Append(DOVirtual.Float(animator.GetFloat("Blend"), 1f, 0.2f, v => animator.SetFloat("Blend", v)));

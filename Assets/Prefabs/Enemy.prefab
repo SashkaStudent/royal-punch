@@ -91,6 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4d3e66127b39b344a9fb12706322e82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 100
   hitParticles: {fileID: 6918573813781037858}
 --- !u!1 &6400496719780481198
 GameObject:
@@ -759,7 +760,7 @@ ParticleSystem:
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
     donutRadius: 0.2
-    m_Position: {x: 0, y: 0.73, z: -0.02}
+    m_Position: {x: 0, y: 0.33, z: -0.15}
     m_Rotation: {x: 0, y: 0, z: 0}
     m_Scale: {x: 0.23, y: 0.11, z: 0.11}
     placementMode: 0

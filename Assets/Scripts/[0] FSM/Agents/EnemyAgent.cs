@@ -11,6 +11,7 @@ public class EnemyAgent : StateMachineAgent
         base.Start();
         States.Add("Fight", new FightState());
         States.Add("Spell", new SpellState());
+        States.Add("Lie", new LieState());
 
         TransitionToState(entryState);
     }

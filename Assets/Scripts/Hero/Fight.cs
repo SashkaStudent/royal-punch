@@ -9,41 +9,48 @@ public class Fight : MonoBehaviour
     [SerializeField]
     private float minDistance = 1f;
     public float MinDistance => minDistance;
+    [SerializeField]
+    private int damage = 10;
 
     private Animator animator;
 
-    public event Action OnHit;
+    public event Action<int> OnHit;
     // Update is called once per frame
-
+    [SerializeField]
+    private int cooldownMs = 500;
+    private bool cooldown = true;
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
-        Punch();
+        //   Punch();
     }
     void Update()
     {
-        if(transform.position.magnitude <= minDistance)
+        if (transform.position.magnitude <= minDistance)
         {
-        
             animator.SetLayerWeight(1, 1);
-            
-        } else
-        {
+            if (cooldown)
+            {
+                OnHit?.Invoke(damage);
+                cooldown = false;
+                UniTask.Delay(cooldownMs).ContinueWith(() => cooldown = true);
+            }
+        }
+        else
             animator.SetLayerWeight(1, 0);
 
-        }
     }
 
-    async UniTask Punch()
-    {
-        while (true)
-        {
-            if(transform.position.magnitude <= minDistance)
-            {
-                OnHit?.Invoke();
-                await UniTask.Delay(500);
-            }
-            await UniTask.DelayFrame(1);
-        }
-    }
+    //async UniTask Punch()
+    //{
+    //    while (true)
+    //    {
+    //        if(transform.position.magnitude <= minDistance)
+    //        {
+    //            OnHit?.Invoke();
+    //            await UniTask.Delay(500);
+    //        }
+    //        await UniTask.DelayFrame(1);
+    //    }
+    //}
 }

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,17 +17,36 @@ public class Movement : MonoBehaviour
     [SerializeField]
     private GameObject mesh;
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
 
         if (!TryGetComponent(out input) || animator == null) return;
 
-        input.OnMove += MoveHandler;
-        input.OnEndMove += OnEndMove;
-        
+        //input.OnMove += MoveHandler;
+        //input.OnEndMove += OnEndMove;
     }
 
+    void Start()
+    {
+
+
+    }
+
+    private void OnEnable()
+    {
+        input.OnMove += MoveHandler;
+        input.OnEndMove += OnEndMove;
+    }
+
+    private void OnDisable()
+    {
+
+        input.OnMove -= MoveHandler;
+        input.OnEndMove -= OnEndMove;
+        animator.SetFloat("Horizontal", 0);
+        animator.SetFloat("Vertical", 0);
+    }
     private void OnEndMove()
     {
     }
@@ -40,11 +60,11 @@ public class Movement : MonoBehaviour
         if(transform.position.magnitude > minDistance || localDirection.z < 0)
             transform.position += localDirection.z * speed * Time.deltaTime * transform.forward;
 
-        Vector3 direction = transform.TransformDirection(localDirection);
-
+        Vector3 direction = transform.TransformDirection(new(localDirection.x, localDirection.y, Mathf.Abs(localDirection.z)));
+        
         Vector3 meshLook = direction.sqrMagnitude > 0 ? direction : transform.forward; 
-
-        mesh.transform.rotation = Quaternion.LookRotation(meshLook);
+        Quaternion look = Quaternion.LookRotation(meshLook);
+        mesh.transform.DORotateQuaternion(look, 0.2f);
         
 
         animator.SetFloat("Horizontal", localDirection.x);

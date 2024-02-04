@@ -4,9 +4,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class EnemySpell : MonoBehaviour
 {
+    [Inject]
+    EnemyHealth health;
+
     [SerializeField]
     private List<GameObject> spellPrefabs;
     public List<Func<UniTask>> spells;
