@@ -14,7 +14,8 @@ public class SpellState : BaseState
     {
         stateName = "Spell";
         enemySpell = agent.GetComponent<EnemySpell>();
-        UniTask.Create(enemySpell.spells[2])
+        int rand = Random.Range(0,enemySpell.spells.Count);
+        UniTask.Create(enemySpell.spells[rand])
             .ContinueWith(()=>agent.TransitionToState("Fight"));
     }
 

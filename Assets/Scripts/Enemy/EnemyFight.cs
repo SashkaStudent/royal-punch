@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,7 +38,13 @@ public class EnemyFight : MonoBehaviour
         float dot = Vector3.Dot(playerFight.transform.forward, transform.forward);
 
         if (playerFight.transform.position.magnitude < playerFight.MinDistance && dot < dotThreashold)
-            animator.SetFloat("Blend", 1);
+        {
+            Sequence sb = DOTween.Sequence();
+            sb.Append(DOVirtual.Float(animator.GetFloat("Blend"), 1f, 0.2f, v => animator.SetFloat("Blend", v)));
+          //  animator.SetFloat("Blend", 1);
+
+        }
+
         else SetAnimRound();
 
 
@@ -47,6 +54,8 @@ public class EnemyFight : MonoBehaviour
 
     public void SetAnimRound()
     {
-        animator.SetFloat("Blend", 0.5f);
+        Sequence sb = DOTween.Sequence();
+        sb.Append(DOVirtual.Float(animator.GetFloat("Blend"), 0.5f, 0.2f, v => animator.SetFloat("Blend", v)));
+   //     animator.SetFloat("Blend", 0.5f);
     }
 }
