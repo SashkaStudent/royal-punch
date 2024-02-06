@@ -13,6 +13,8 @@ public class StateMachineAgent : MonoBehaviour
     protected BaseState currentState;
     public Action<StateMachineAgent> OnFinishWork;
     public string CurrentStateName => currentState?.StateName;
+    [NonSerialized]
+    public bool IsWinner = false;
     public virtual void TransitionToState(string stateName)
     {
         if (currentState != null)
@@ -36,6 +38,12 @@ public class StateMachineAgent : MonoBehaviour
         thisTransform = transform;
         States = new Dictionary<string, BaseState>();
     }
+
+    protected virtual void Update()
+    {
+        DoWork();
+    }
+
 #if UNITY_EDITOR
     protected void OnDrawGizmos()
     {

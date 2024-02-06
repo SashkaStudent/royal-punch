@@ -1,13 +1,16 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 public class LieState : BaseState
 {
     Dictionary<Rigidbody, Quaternion> recorded = new();
+    Health health;
     public override void DoWork(StateMachineAgent agent)
     {
     }
@@ -17,8 +20,18 @@ public class LieState : BaseState
         stateName = "Lie";
 
         Animator animator = agent.GetComponentInChildren<Animator>();
+        
 
-    //    agent.GetComponentInChildren<Animator>().speed = 0f;
+        health = agent.GetComponent<Health>();
+        var ct = new CancellationTokenSource();
+
+        void activateCt() { ct.Cancel(); health.OnDead -= activateCt; }
+
+        if (health.Current <= 0) activateCt();
+        else
+            health.OnDead += activateCt;
+
+        //    agent.GetComponentInChildren<Animator>().speed = 0f;
         animator.enabled = false;
 
         //animator.runtimeAnimatorController.animationClips.ToList().ForEach(c =>
@@ -36,16 +49,19 @@ public class LieState : BaseState
             if (rb.CompareTag("Hip")) { 
                 
                 hip = rb.position; }
-          //  Record(rb);
             rb.isKinematic = false;
             rb.velocity = -agent.transform.forward;
         });
         if (agent is HeroAgent ha) recorded = ha.recorded;
 
-        UniTask.Delay(2000).ContinueWith(
+
+
+        if(agent is HeroAgent)
+        UniTask.Delay(2000, cancellationToken: ct.Token).ContinueWith(
 
            async () =>
            {
+
                agent.GetComponentsInChildren<Rigidbody>()
                .ToList()
                .ForEach(rb => { if (rb.CompareTag("Hip")) rb.AddForce((Vector3.up + agent.transform.forward) * 1000); });

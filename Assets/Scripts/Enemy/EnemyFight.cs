@@ -20,6 +20,15 @@ public class EnemyFight : MonoBehaviour
     Fight playerFight;
 
     float blend = 0.5f;
+
+    [SerializeField]
+    private int cooldownMs = 500;
+    private bool cooldown = true;
+
+    [SerializeField]
+    private int damage = 20;
+    public int Damage => damage;
+    public event Action<int> OnHit;
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
@@ -41,10 +50,16 @@ public class EnemyFight : MonoBehaviour
         {
             Sequence sb = DOTween.Sequence();
             sb.Append(DOVirtual.Float(animator.GetFloat("Blend"), 1f, 0.2f, v => animator.SetFloat("Blend", v)));
-          //  animator.SetFloat("Blend", 1);
+
+            if (cooldown)
+            {
+                OnHit?.Invoke(damage);
+                cooldown = false;
+                UniTask.Delay(cooldownMs).ContinueWith(() => cooldown = true);
+            }
+            //  animator.SetFloat("Blend", 1);
 
         }
-
         else SetAnimRound();
 
 

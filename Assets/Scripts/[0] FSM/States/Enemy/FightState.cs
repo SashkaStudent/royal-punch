@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using Zenject;
@@ -13,6 +14,10 @@ public class FightState : BaseState
     StateMachineAgent agent;
     public override void DoWork(StateMachineAgent agent)
     {
+        if (agent.IsWinner)
+        {
+            agent.TransitionToState("Victory");
+        }
     }
 
     public override void EnterState(StateMachineAgent agent)
@@ -28,13 +33,26 @@ public class FightState : BaseState
 
         health.OnHealthChanged += HealthChangedHandler;
 
-        Test(agent);
+        agent.GetComponentInChildren<Animator>().enabled = true;
+        //  agent.GetComponentInChildren<Animator>().speed = 1f;
+
+        agent.GetComponentsInChildren<Rigidbody>().ToList().ForEach(rb => {
+            rb.isKinematic = true;
+            rb.velocity = Vector3.zero;
+        });
+
+
+        UniTask.Delay(Random.Range(2000, 5000)).ContinueWith(() => {
+            if (health.Current > 0 && !agent.IsWinner)
+                agent.TransitionToState("Spell");
+        });
+
         
     }
 
-    private void HealthChangedHandler(float newValue)
+    private void HealthChangedHandler(int health, int value)
     {
-        if (newValue <= 0)
+        if (health <= 0)
         {
             agent.TransitionToState("Lie");
         }
@@ -47,14 +65,12 @@ public class FightState : BaseState
 
     async UniTask Test(StateMachineAgent agent)
     {
-      //  var tsc = new CancellationTokenSource();
-      //  UniTask.Create(async () => { await UniTask.Delay(7000); Debug.Log("CANCEL!"); tsc.Cancel();});
 
-          //  fight.SetAnimRound();
         await UniTask.Delay(5000);
-        //  await UniTask.Create(fight.spells[0]).AttachExternalCancellation(tsc.Token);
-        if(health.Current > 0)
-          agent.TransitionToState("Spell");
+        if (health.Current > 0 && !agent.IsWinner)
+            agent.TransitionToState("Spell");
+        else if (agent.IsWinner)
+            agent.TransitionToState("Victory");
 
     }
 }

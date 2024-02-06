@@ -7,10 +7,14 @@ using UnityEngine;
 public class MovementState : BaseState
 {
     Movement movement;
-
+    HeroHealth health;
+    StateMachineAgent agent;
     public override void DoWork(StateMachineAgent agent)
     {
-
+        if (agent.IsWinner)
+        {
+            agent.TransitionToState("Victory");
+        }
     }
 
     public override void EnterState(StateMachineAgent agent)
@@ -19,7 +23,8 @@ public class MovementState : BaseState
 
         agent.GetComponent<Movement>().enabled = true;
         agent.GetComponent<Fight>().enabled = true;
-
+        health = agent.GetComponent<HeroHealth>();
+        this.agent = agent;
         //if (agent.TryGetComponent(out movement))
         //    movement.enabled = true;
         
@@ -31,8 +36,16 @@ public class MovementState : BaseState
             rb.velocity = Vector3.zero;
         });
 
-        UniTask.Delay(5000).ContinueWith(()=>agent.TransitionToState("Lie"));
+        health.OnPunch += PunchHandler;
+        health.OnDead += PunchHandler;
 
+        //   UniTask.Delay(5000).ContinueWith(()=>agent.TransitionToState("Lie"));
+
+    }
+
+    private void PunchHandler()
+    {
+        agent.TransitionToState("Lie");
     }
 
     public override void ExitState(StateMachineAgent agent)
@@ -40,6 +53,8 @@ public class MovementState : BaseState
         if (agent.TryGetComponent(out movement))
             movement.enabled = false;
         agent.GetComponent<Fight>().enabled = false;
+
+        health.OnPunch -= PunchHandler;
 
     }
 

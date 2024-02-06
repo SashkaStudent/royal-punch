@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class Fight : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class Fight : MonoBehaviour
     [SerializeField]
     private int cooldownMs = 500;
     private bool cooldown = true;
+    [Inject]
+    EnemyHealth enemyHealth;
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
@@ -26,15 +29,15 @@ public class Fight : MonoBehaviour
     }
     void Update()
     {
-        if (transform.position.magnitude <= minDistance)
+        if (transform.position.magnitude <= minDistance && cooldown && enemyHealth.Current > 0)
         {
-            animator.SetLayerWeight(1, 1);
-            if (cooldown)
-            {
+
+                animator.SetLayerWeight(1, 1);
+
                 OnHit?.Invoke(damage);
                 cooldown = false;
                 UniTask.Delay(cooldownMs).ContinueWith(() => cooldown = true);
-            }
+            
         }
         else
             animator.SetLayerWeight(1, 0);

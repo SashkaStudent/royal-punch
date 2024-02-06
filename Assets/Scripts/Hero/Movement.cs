@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    [SerializeField]
+    private Vector3 arenaSize;
+
     private BaseInput input; //Zenject
     private Animator animator;
     [SerializeField]
@@ -57,8 +60,23 @@ public class Movement : MonoBehaviour
 
         transform.RotateAround(Vector3.zero, Vector3.up, -localDirection.x * (angleSpeed / transform.position.magnitude) * Time.deltaTime);
 
-        if(transform.position.magnitude > minDistance || localDirection.z < 0)
-            transform.position += localDirection.z * speed * Time.deltaTime * transform.forward;
+        if (transform.position.magnitude > minDistance || localDirection.z < 0)
+        {
+            Vector3 newPos = transform.position + localDirection.z * speed * Time.deltaTime * transform.forward;
+
+            newPos = new(
+                Mathf.Clamp(newPos.x, -arenaSize.x, arenaSize.x),
+                newPos.y,
+                Mathf.Clamp(newPos.z, -arenaSize.z, arenaSize.z)
+                );
+
+            transform.position = newPos;
+
+        }
+
+
+
+
 
         Vector3 direction = transform.TransformDirection(new(localDirection.x, localDirection.y, Mathf.Abs(localDirection.z)));
         

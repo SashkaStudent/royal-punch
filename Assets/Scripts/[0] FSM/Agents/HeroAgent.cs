@@ -2,17 +2,38 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Zenject;
 
 public class HeroAgent : StateMachineAgent
 {
     public Dictionary<Rigidbody, Quaternion> recorded = new();
-   
+
+    [Inject]
+    EnemyHealth enemyHealth;
 
     protected override void Start()
     {
+        Record();
+
+        base.Start();
+        States.Add("Movement", new MovementState());
+        States.Add("Lie", new LieState());
+        States.Add("Victory", new VictoryState());
+
+        enemyHealth.OnDead += EnemyDeadHandler;
+
+        TransitionToState(entryState);
+    }
+
+    private void EnemyDeadHandler()
+    {
+        IsWinner = true;
+    }
+
+    private void Record()
+    {
         Animator animator = GetComponentInChildren<Animator>();
 
-        //    agent.GetComponentInChildren<Animator>().speed = 0f;
         animator.enabled = false;
 
         animator.runtimeAnimatorController.animationClips.ToList().ForEach(c =>
@@ -21,27 +42,10 @@ public class HeroAgent : StateMachineAgent
                 c.SampleAnimation(animator.gameObject, 0);
 
             GetComponentsInChildren<Rigidbody>().ToList().ForEach(rb => {
-                Record(rb);
+                recorded[rb] = rb.transform.localRotation;
             });
 
         });
-
-        base.Start();
-        States.Add("Movement", new MovementState());
-        States.Add("Lie", new LieState());
-
-        TransitionToState(entryState);
     }
 
-
-    private void Record(Rigidbody rb)
-    {
-        recorded[rb] = rb.transform.localRotation;
-    }
-
-    private void Read(Rigidbody rb)
-    {
-        //rb.transform.rotation = recorded[rb];
-     //   rb.transform.DORotateQuaternion(recorded[rb], 0.4f);
-    }
 }

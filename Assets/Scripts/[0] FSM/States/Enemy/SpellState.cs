@@ -12,11 +12,18 @@ public class SpellState : BaseState
 
     public override void EnterState(StateMachineAgent agent)
     {
+
+
         stateName = "Spell";
         enemySpell = agent.GetComponent<EnemySpell>();
         int rand = Random.Range(0,enemySpell.spells.Count);
         UniTask.Create(enemySpell.spells[rand])
-            .ContinueWith(()=>agent.TransitionToState("Fight"));
+            .ContinueWith(()=> {
+                if(agent.GetComponent<EnemyHealth>().Current > 0)
+                agent.TransitionToState("Fight");
+                else
+                agent.TransitionToState("Lie");
+            });
     }
 
     public override void ExitState(StateMachineAgent agent)
